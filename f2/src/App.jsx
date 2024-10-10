@@ -132,8 +132,18 @@ const App = () => {
   return (
     <div>
       <h1>Store Dalivery Zone Checker</h1>
-      <button onClick={handleGetLocation}>Get My location</button>
-      <button onClick={handleLocationCheck}>Check Delivery Availabiliy</button>
+      <button
+        className="btn btn-outline btn-primary"
+        onClick={handleGetLocation}
+      >
+        Get My location
+      </button>
+      <button
+        className="btn btn-outline btn-accent"
+        onClick={handleLocationCheck}
+      >
+        Check Delivery Availabiliy
+      </button>
       <div>
         <MapContainer
           center={center}

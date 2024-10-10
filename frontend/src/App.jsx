@@ -22,6 +22,23 @@ const App = () => {
     lng:100.04233271,
     radius: 1000,
   });
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(url + "/api/stores");
+        console.log(response.data);
+
+        if (response.status === 200) {
+          setStores(response.data);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchData();
+  }, []);
+  
 //function to calulate calulate distance between 2 points using Haversine Formular
 const calculateDistance = (lat1, lng1, lat2, lng2) => {
     const R = 6371e3; //Eath radius in meters

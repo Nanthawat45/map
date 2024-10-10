@@ -10,11 +10,11 @@ const stores = require("./stores")
 
 const app = express();
 
-const corsOption = {
+const corsOptions = {
     origin: frontend_url,
 };
 
-app.use(cors(corsOption));
+app.use(cors(corsOptions));
 
 app.get("/api/stores",(req,res)=>{
     res.json(stores);
