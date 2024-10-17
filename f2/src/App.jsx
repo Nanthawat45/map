@@ -97,7 +97,7 @@ const App = () => {
       });
       return;
     }
-    if (deliveryZone.lat === "" || deliveryZone.lng === "") {
+    if (!deliveryZone.lat  || !deliveryZone.lng ) {
       Swal.fire({
         title: "Error !",
         text: "Please enter your valid location",
@@ -155,20 +155,15 @@ const App = () => {
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
-          {/**Display My Location */}
-          <Marker position={[myLocation.lat, myLocation.lng]}>
-            <Popup>
-              A pretty CSS3 popup. <br /> Easily customizable.
-            </Popup>
-          </Marker>
 
           {/**Display all stores on map */}
           {stores &&
-            stores.map((store, index) => {
+            stores.map((store) => {
               return (
-                <Marker
-                  position={[store.lat, store.lng]}
-                  key={store.id || index}
+                <Marker 
+                position={[store.lat, store.lng]} 
+                key={store.id}
+                
                 >
                   <Popup>
                     <p>{store.name}</p>
@@ -178,7 +173,7 @@ const App = () => {
                 </Marker>
               );
             })}
-
+          {myLocation.lat && myLocation.lng && <Locationmap />}
           <Locationmap />
         </MapContainer>
       </div>
