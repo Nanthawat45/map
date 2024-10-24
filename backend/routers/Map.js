@@ -4,11 +4,9 @@ const mapController = require("../controllers/map.controller");
 const { authJwt } = require("../middleware");
 
 // Create a map
-router.post(
-  "/",
+router.post("/", 
   [authJwt.verifyToken, authJwt.isAdminOrMod],
-  mapController.create
-);
+   mapController.create);
 
 // Get all maps
 router.get("/", mapController.getAll);

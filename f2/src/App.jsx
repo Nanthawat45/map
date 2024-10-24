@@ -9,12 +9,15 @@ import {
 import "leaflet/dist/leaflet.css";
 import axios from "axios";
 import "./App.css";
-const base_url = import.meta.env.VITE_API_BASE_URL;
+import Maps from "./services/Map.services"
+const base_url = import.meta.env.VITE_BASE_URL; // ค่าจาก .env
+import Edit from "./pages/Add2"
 import Swal from "sweetalert2";
 import { Icon } from "leaflet";
 
 const App = () => {
-  const center = [13.838487865712025, 100.02534086066446]; //SE NPRU
+  const [isAdmin, setIsAdmin] = useState(true);
+  const center = [13.838487865712025, 100.02534086066446]; // SE NPRU
   const [stores, setStores] = useState([]);
   const [myLocation, setMyLocation] = useState({ lat: "", lng: "" });
   const [deliveryZone, setDeliveryZone] = useState({
@@ -23,9 +26,17 @@ const App = () => {
     radius: 1000,
   });
   const [selectedStore, setSelectedStore] = useState(null);
-  //function to calulate calulate distance between 2 points using Haversine Formular
+  const [newStore, setNewStore] = useState({
+    name: "",
+    address: "",
+    direction: "",
+    lat: "",
+    lng: "",
+    radius: "",
+  });
+
   const calculateDistance = (lat1, lng1, lat2, lng2) => {
-    const R = 6371e3; //Eath radius in meters
+    const R = 6371e3; // Earth radius in meters
     const phi_1 = (lat1 * Math.PI) / 180;
     const phi_2 = (lat2 * Math.PI) / 180;
 
@@ -39,40 +50,54 @@ const App = () => {
         Math.sin(delta_lambda / 2) *
         Math.sin(delta_lambda / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return R * c; //Distance in meters
+    return R * c; // Distance in meters
   };
 
   useEffect(() => {
     const fetchStore = async () => {
       try {
-        const response = await axios.get(base_url + "/api/stores");
+        const response = await axios.get(base_url + "/api/v1/maps"); // เปลี่ยนไปใช้ API ของคุณ
         console.log(response.data);
         if (response.status === 200) {
-          setStores(response.data);
+          if (Array.isArray(response.data)) {
+            setStores(response.data);
+          } else {
+            setStores([]); // Default empty array
+          }
         }
       } catch (error) {
         console.error("Error fetching stores:", error);
+        setStores([]); // Default empty array on error
       }
     };
     fetchStore();
   }, []);
-  
-  //housingIcon;
+
   const housingIcon = new Icon({
     iconUrl: "https://img.icons8.com/plasticine/100/exterior.png",
     iconSize: [38, 45], // size of the icon
   });
+
   const defaultIcon = new Icon({
-    iconUrl: "https://img.icons8.com/plasticine/100/exterior.png", // หรือ URL ของไอคอนที่คุณต้องการใช้
+    iconUrl: "https://img.icons8.com/plasticine/100/exterior.png",
     iconSize: [38, 45], // ขนาดของไอคอน
+  });
+
+  const selectedIcon = new Icon({
+    iconUrl:
+      "https://img.icons8.com/?size=100&id=21240&format=png&color=000000",
+    iconSize: [25, 26],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
   });
 
   const Locationmap = () => {
     useMapEvent({
       click(e) {
         const { lat, lng } = e.latlng;
+        setNewStore({ ...newStore, lat, lng }); // Update lat, lng when user clicks
         setMyLocation({ lat, lng });
-        console.log("Click at latitue:" + lat + "longtitue" + lng);
+        console.log("Clicked at lat: " + lat + ", lng: " + lng);
       },
     });
     return (
@@ -84,16 +109,6 @@ const App = () => {
     );
   };
 
-  
-
-  const selectedIcon = new Icon({
-    iconUrl:
-      "https://img.icons8.com/?size=100&id=21240&format=png&color=000000",
-    iconSize: [25, 26],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34],
-  });
-
   const handleGetLocation = () => {
     navigator.geolocation.getCurrentPosition((position) => {
       setMyLocation({
@@ -102,6 +117,8 @@ const App = () => {
       });
     });
   };
+
+
 
   const handleLocationCheck = () => {
     if (myLocation.lat === "" || myLocation.lng === "") {
@@ -113,7 +130,7 @@ const App = () => {
       });
       return;
     }
-    if (!deliveryZone.lat  || !deliveryZone.lng ) {
+    if (!deliveryZone.lat || !deliveryZone.lng) {
       Swal.fire({
         title: "Error !",
         text: "Please enter your valid location",
@@ -144,22 +161,72 @@ const App = () => {
       });
     }
   };
+  
+
+  const handleDelete = async (id) => {
+    try {
+      const response = await Maps.deleteCourse(id);
+      if (response.status === 200) {
+        Swal.fire({
+          icon: "success",
+          title: "Deleted!",
+          text: response.data.message,
+          position: "center",
+          timer: 7000,
+        }).then(() => {
+          window.location.reload();
+        });
+      }
+    } catch (error) {
+      Swal.fire({
+        position: "center",
+        icon: "error",
+        title: "Error Deleting Course",
+        text: error?.response?.data?.message || "Something went wrong!",
+        timer: 1500,
+      });
+    }
+  };
+  
+  
+  // ฟังก์ชันลบร้านค้า
+  const handleDeleteStore = async (id) => {
+    const response = await StoreService.deletestore(id);
+    const confirmed = await Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    });
+
+    const handleEditStore = (store) => {
+      // ส่ง store ไปยัง Add เพื่อทำการแก้ไข
+      navigate("/add", { state: { store } });
+    };
+
+  };
 
   return (
     <div>
-      <h1>Store Dalivery Zone Checker</h1>
+      <h1>Store Delivery Zone Checker</h1>
       <button
         className="btn btn-outline btn-primary"
         onClick={handleGetLocation}
       >
-        Get My location
+        Get My Location
       </button>
       <button
         className="btn btn-outline btn-accent"
         onClick={handleLocationCheck}
       >
-        Check Delivery Availabiliy
+        Check Delivery Availability
       </button>
+
+      
+
       <div>
         <MapContainer
           center={center}
@@ -172,43 +239,41 @@ const App = () => {
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
 
-          {/**Display all stores on map */}
-          {stores &&
-            stores.map((store) => {
-              return (
-                <Marker 
-                position={[store.lat, store.lng]} 
-                key={store.id}
-                
-                icon={selectedStore === store.id ? selectedIcon : defaultIcon} // เปลี่ยนสีไอคอนตามร้านที่เลือก
-                  eventHandlers={{
-                    click: () => {
-                      setDeliveryZone({
-                        lat: store.lat,
-                        lng: store.lng,
-                        radius: 700, // สามารถปรับ radius ได้
-                      });
-                      setSelectedStore(store.id); // ตั้งค่าให้ร้านค้าที่ถูกเลือก
-                      Swal.fire({
-                        title: "Store Selected",
-                        text: `You have selected ${store.name} as your delivery zone.`,
-                        icon: "info",
-                        confirmButtonText: "OK",
-                      });
-                    },
-                  }}
-                >
-
-                  <Popup>
-                    <p>{store.name}</p>
-                    <p>{store.address}</p>
-                    <a href={store.direction}>Get Direction</a>
-                  </Popup>
-                </Marker>
-              );
-            })}
+{stores &&
+      stores.map((store) => (
+        <Marker
+          position={[store.lat, store.lng]}
+          key={store.id}
+          icon={selectedStore === store.id ? selectedIcon : defaultIcon}
+          eventHandlers={{
+            click: () => {
+              setDeliveryZone({
+                lat: store.lat,
+                lng: store.lng,
+                radius: store.radius,
+              });
+              setSelectedStore(store.id);
+            },
+          }}
+        >
+          <Popup>
+            <p>{store.name}</p>
+            <p>{store.address}</p>
+            <a href={store.direction}>Get Direction</a>
+            {isAdmin && ( // ตรวจสอบว่าเป็น admin หรือไม่
+              <>
+                <button onClick={() => handleEditStore(store)} className="btn btn-warning">
+                  Edit Store
+                </button>
+                <button onClick={() => handleDelete(store.id)} className="btn btn-danger">
+                  Delete Store
+                </button>
+              </>
+            )}
+          </Popup>
+        </Marker>
+      ))}
           {myLocation.lat && myLocation.lng && <Locationmap />}
-          
         </MapContainer>
       </div>
     </div>
