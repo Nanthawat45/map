@@ -7,15 +7,17 @@ const authRouter = require("./routers/auth.routers");
 const db = require("./models/");
 const role = db.Role;
 const cors = require("cors");
-const F2URL = process.env.F2URL_P;
+//const F2URL = process.env.F2URL_P;
 
 // List of stores
 const stores = require("./stores");
 
+// const corsOption = {
+//     origin: F2UR,
+// };
 const corsOption = {
-    origin: F2UR,
+    origin: "https://map-nu-beige.vercel.app/",
 };
-
 // use middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
