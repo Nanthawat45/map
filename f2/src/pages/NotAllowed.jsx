@@ -3,12 +3,12 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 const NotAllowed = () => {
-  const [counter, setCounter] = useState(10);
+  const [counter, setCounter] = useState(3);
   const navigate = useNavigate();
   useEffect(() => {
     const timer = setTimeout(() => {
       navigate("/");
-    }, 10000);
+    }, 3000);
 
     const constDown = setInterval(() => {
       setCounter((prevCounter) => {

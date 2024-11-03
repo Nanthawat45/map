@@ -6,7 +6,7 @@ const Add = lazy(() => import("../pages/Add.jsx"));
 
 const APP = lazy(() => import("../App.jsx"));
 
-// import Edit from "../pages/Edit.jsx";
+import Edit from "../pages/Edit.jsx";
 // const Edit = lazy(() => import("../pages/Edit.jsx"));
 
 // import Login from "../pages/Login.jsx";
@@ -35,14 +35,14 @@ const Router = createBrowserRouter([
          <Add />,
          </ModOrAdminPage>
       },
-      // {
-      //   path: "edit/:id",
-      //   element: (
-      //     <ModOrAdminPage>
-      //       <Edit />
-      //     </ModOrAdminPage>
-      //   ),
-      // },
+      {
+        path: "edit/:id",
+        element: (
+          <ModOrAdminPage>
+            <Edit />
+          </ModOrAdminPage>
+        ),
+      },
       { path: "login", element: <Login /> },
       {
         path: "register",

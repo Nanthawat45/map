@@ -7,10 +7,21 @@ import { Link, useNavigate } from "react-router-dom";
 
 const Navbar = () => {
   const { user, logout } = useAuthContext();
+  const navigate = useNavigate();
+
+  // เพิ่มฟังก์ชัน handleGetLocation
+  const handleGetLocation = () => {
+    navigator.geolocation.getCurrentPosition((position) => {
+      // ทำอะไรบางอย่างกับตำแหน่งที่ได้ เช่น
+      console.log("Current position:", position);
+      // อาจจะมีการเปลี่ยนเส้นทางไปยังหน้า Edit โดยส่งข้อมูลตำแหน่ง
+      navigate(`/edit/${storeId}`); // ต้องมี storeId ที่นี่
+    });
+  };
+
   const menus = {
     ROLES_ADMIN: [
       { name: "Add Academic", link: "/add" },
-
       { name: "Home", link: "/" },
     ],
     ROLES_USER: [
@@ -21,12 +32,13 @@ const Navbar = () => {
       { name: "Home", link: "/" },
     ],
   };
-  //console.log("user", user);
+
   return (
     <div>
       <div className="navbar bg-base-100">
         <div className="flex-none">
-          <button className="btn btn-square btn-ghost">
+          <button className="btn btn-square btn-ghost" onClick={handleGetLocation}>
+            {/* ปุ่มเพื่อเรียกใช้งาน handleGetLocation */}
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -42,36 +54,26 @@ const Navbar = () => {
             </svg>
           </button>
         </div>
-        <ul className="menu menu-horizontal px-1">      
-           {user &&
-          //ถ้า menus user.ROLE_ADMIN role ตำแหน่งที่ 1 มาจาก user 
-          
-            menus[user.roles[0]].map((menuItem) => (             
+        <ul className="menu menu-horizontal px-1">
+          {user &&
+            menus[user.roles[0]].map((menuItem) => (
               <li key={menuItem.name}>
-                <a
-                  href={menuItem.link}
-                  className="text-white hover:text-gray-300"
-                >
+                <a href={menuItem.link} className="text-white hover:text-gray-300">
                   {menuItem.name}{" "}
                 </a>
               </li>
-            ))}            
+            ))}
         </ul>
         <div className="navbar-end space-x-2">
           {user && (
             <div className="text-center">
               welcome : <span className="font-medium">{user.username}</span>
               <div className="space-x-1 font-normal">
-                {user.roles.map((role, index) => {
-                  return (
-                  <span
-                    key={index}
-                    className="badge badge-primary badge-outline text-xs"
-                  >
+                {user.roles.map((role, index) => (
+                  <span key={index} className="badge badge-primary badge-outline text-xs">
                     {role}
                   </span>
-                  );
-                })}
+                ))}
               </div>
             </div>
           )}

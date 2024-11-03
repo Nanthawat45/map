@@ -11,11 +11,14 @@ import axios from "axios";
 import "./App.css";
 import Maps from "./services/Map.services"
 const base_url = import.meta.env.VITE_BASE_URL; // ค่าจาก .env
-import Edit from "./pages/Add2"
+import Edit from "./pages/Edit"
 import Swal from "sweetalert2";
 import { Icon } from "leaflet";
+import {useAuthContext} from "./context/AuthContext"
+import { Circle } from "react-leaflet";
 
 const App = () => {
+  const { user } = useAuthContext();
   const [isAdmin, setIsAdmin] = useState(true);
   const center = [13.838487865712025, 100.02534086066446]; // SE NPRU
   const [stores, setStores] = useState([]);
@@ -74,22 +77,23 @@ const App = () => {
   }, []);
 
   const housingIcon = new Icon({
-    iconUrl: "https://img.icons8.com/plasticine/100/exterior.png",
-    iconSize: [38, 45], // size of the icon
+    iconUrl: "https://img.icons8.com/?size=100&id=2797&format=png&color=000000",
+    iconSize: [30, 30], // size of the icon
+    iconAnchor: [19, 30], // ปรับตำแหน่ง anchor
   });
 
-  const defaultIcon = new Icon({
-    iconUrl: "https://img.icons8.com/plasticine/100/exterior.png",
-    iconSize: [38, 45], // ขนาดของไอคอน
-  });
+const defaultIcon = new Icon({
+    iconUrl: "https://img.icons8.com/?size=100&id=73&format=png&color=000000",
+    iconSize: [30, 30], // ขนาดของไอคอน
+    iconAnchor: [19, 30], // ปรับตำแหน่ง anchor
+});
 
-  const selectedIcon = new Icon({
-    iconUrl:
-      "https://img.icons8.com/?size=100&id=21240&format=png&color=000000",
-    iconSize: [25, 26],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34],
-  });
+const selectedIcon = new Icon({
+    iconUrl: "https://img.icons8.com/?size=100&id=8287&format=png&color=000000",
+    iconSize: [30, 30],
+    iconAnchor: [19, 30],
+});
+
 
   const Locationmap = () => {
     useMapEvent({
@@ -224,9 +228,6 @@ const App = () => {
       >
         Check Delivery Availability
       </button>
-
-      
-
       <div>
         <MapContainer
           center={center}
@@ -240,39 +241,58 @@ const App = () => {
           />
 
 {stores &&
-      stores.map((store) => (
-        <Marker
-          position={[store.lat, store.lng]}
-          key={store.id}
-          icon={selectedStore === store.id ? selectedIcon : defaultIcon}
-          eventHandlers={{
-            click: () => {
-              setDeliveryZone({
-                lat: store.lat,
-                lng: store.lng,
-                radius: store.radius,
-              });
-              setSelectedStore(store.id);
-            },
-          }}
-        >
-          <Popup>
-            <p>{store.name}</p>
-            <p>{store.address}</p>
-            <a href={store.direction}>Get Direction</a>
-            {isAdmin && ( // ตรวจสอบว่าเป็น admin หรือไม่
-              <>
-                <button onClick={() => handleEditStore(store)} className="btn btn-warning">
-                  Edit Store
-                </button>
+  stores.map((store) => (
+    <Marker
+      position={[store.lat, store.lng]}
+      key={store.id}
+      icon={selectedStore === store.id ? selectedIcon : defaultIcon}
+      eventHandlers={{
+        click: () => {
+          setDeliveryZone({
+            lat: store.lat,
+            lng: store.lng,
+            radius: store.radius,
+          });
+          setSelectedStore(store.id); // ตั้งร้านค้าที่ถูกเลือก
+        },
+      }}
+    >
+      <Popup>
+        <p>{store.name}</p>
+        <p>{store.address}</p>
+        <a href={store.direction}>Get Direction</a>
+
+        {user &&
+          (user.roles.includes("ROLES_MODERATOR") ||
+            user.roles.includes("ROLES_ADMIN")) && (
+            <div className="card-actions justify-center">
+              <a
+                href={`/edit/${store.id}`}
+                className="btn btn-outline btn-warning btn-sm"
+              >
+                Edit
+              </a>
+
+              {user && user.roles && user.roles.includes("ROLES_ADMIN") && (
                 <button onClick={() => handleDelete(store.id)} className="btn btn-danger">
                   Delete Store
                 </button>
-              </>
-            )}
-          </Popup>
-        </Marker>
-      ))}
+              )}
+            </div>
+          )}
+      </Popup>
+
+      {/* วงกลมรอบร้านค้าแสดงเมื่อคลิก */}
+      {selectedStore === store.id && (
+        <Circle
+          center={[store.lat, store.lng]}
+          radius={store.radius} // กำหนดรัศมีของวงกลมตามค่า radius ของร้านค้า
+          pathOptions={{ color: "blue", fillColor: "blue", fillOpacity: 0.2 }}
+        />
+      )}
+    </Marker>
+  ))}
+
           {myLocation.lat && myLocation.lng && <Locationmap />}
         </MapContainer>
       </div>

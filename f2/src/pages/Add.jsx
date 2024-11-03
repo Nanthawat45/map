@@ -57,16 +57,22 @@ const Add = () => {
   }, []);
 
   const housingIcon = new Icon({
-    iconUrl: "https://img.icons8.com/plasticine/100/exterior.png",
-    iconSize: [38, 45],
+    iconUrl: "https://img.icons8.com/?size=100&id=2797&format=png&color=000000",
+    iconSize: [30, 30], // size of the icon
+    iconAnchor: [19, 30], // ปรับตำแหน่ง anchor
   });
 
-  const selectedIcon = new Icon({
-    iconUrl: "https://img.icons8.com/?size=100&id=21240&format=png&color=000000",
-    iconSize: [25, 26],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34],
-  });
+const defaultIcon = new Icon({
+    iconUrl: "https://img.icons8.com/?size=100&id=73&format=png&color=000000",
+    iconSize: [30, 30], // ขนาดของไอคอน
+    iconAnchor: [19, 30], // ปรับตำแหน่ง anchor
+});
+
+const selectedIcon = new Icon({
+    iconUrl: "https://img.icons8.com/?size=100&id=8287&format=png&color=000000",
+    iconSize: [30, 30],
+    iconAnchor: [19, 30],
+});
 
   const Locationmap = () => {
     useMapEvent({
@@ -211,7 +217,7 @@ const Add = () => {
               <Marker
                 position={[store.lat, store.lng]}
                 key={store.id} // ตรวจสอบว่ามี key ที่ unique
-                icon={selectedStore === store.id ? selectedIcon : housingIcon}
+                icon={selectedStore === store.id ? selectedIcon : defaultIcon}
                 eventHandlers={{
                   click: () => {
                     setSelectedStore(store.id);
