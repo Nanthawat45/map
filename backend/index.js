@@ -7,12 +7,13 @@ const authRouter = require("./routers/auth.routers");
 const db = require("./models/");
 const role = db.Role;
 const cors = require("cors");
+const F2URL = process.env.F2URL_P;
 
 // List of stores
 const stores = require("./stores");
 
 const corsOption = {
-    origin: "https://map-pktai60a1-nanthawat45s-projects.vercel.app/",
+    origin: F2UR,
 };
 
 // use middleware
