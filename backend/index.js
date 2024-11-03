@@ -16,7 +16,7 @@ const stores = require("./stores");
 //     origin: F2UR,
 // };
 const corsOption = {
-    origin: "https://map-nu-beige.vercel.app/",
+    origin: "https://map-nu-beige.vercel.app",
 };
 // use middleware
 app.use(express.json());
