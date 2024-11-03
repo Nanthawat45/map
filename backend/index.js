@@ -12,7 +12,7 @@ const cors = require("cors");
 const stores = require("./stores");
 
 const corsOption = {
-    origin: "http://localhost:5173",
+    origin: "https://map-nu-beige.vercel.app",
 };
 
 // use middleware
