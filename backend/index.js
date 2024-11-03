@@ -11,6 +11,10 @@ const cors = require("cors");
 // List of stores
 const stores = require("./stores");
 
+const corsOption = {
+    origin: "https://map-nu-beige.vercel.app/",
+};
+
 // use middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -28,7 +32,7 @@ const initRole = () => {
 }
 
 // ใช้งาน CORS โดยไม่ใช้ corsOptions
-app.use(cors()); // ใช้งาน CORS โดยไม่มีตัวเลือก
+app.use(cors(corsOption)); // ใช้งาน CORS โดยไม่มีตัวเลือก
 
 // use router
 app.use("/api/v1/maps", MAPP);
