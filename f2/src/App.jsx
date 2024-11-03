@@ -11,7 +11,7 @@ import axios from "axios";
 import "./App.css";
 import Maps from "./services/Map.services"
 const base_url = import.meta.env.VITE_BASE_URL; // ค่าจาก .env
-import Edit from "./pages/Edit"
+//import Edit from "./pages/Edit"
 import Swal from "sweetalert2";
 import { Icon } from "leaflet";
 import {useAuthContext} from "./context/AuthContext"
